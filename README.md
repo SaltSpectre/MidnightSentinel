@@ -1,5 +1,9 @@
 # Midnight Sentinel: Protect your OLED investment!
 
+<div align="center">
+  <img src="assets/logo/gh_logo.png" alt="Midnight Sentinel Logo">
+</div>
+
 ## Description
 
 Midnight Sentinel is a simple app that creates pure black, full-screen overlays on all active displays. The intended purpose is to protect OLED screens from burn-in* should you need to step away while leaving your computer running.
@@ -17,6 +21,10 @@ Yep, that's an option. The power buttons on my monitors are annoying to operate,
 ## Screenshot
 
 **insert screenshot here**
+
+<div align="center">
+  <img src="assets/screenshot.png" alt="Simulated black screen">
+</div>
 
 jkjk. This is just a pure black image. But it's similar to the pure-black overlay that will be placed over your screen!
 
