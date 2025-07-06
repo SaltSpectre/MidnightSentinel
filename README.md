@@ -1,24 +1,30 @@
 # Midnight Sentinel: Protect your OLED investment!
 
+<div align="center">
+  <img src="assets/logo/gh_logo.png" alt="Midnight Sentinel Logo">
+</div>
+
 ## Description
 
 Midnight Sentinel is a simple app that creates pure black, full-screen overlays on all active displays. The intended purpose is to protect OLED screens from burn-in* should you need to step away while leaving your computer running.
 
 ### Isn't that what a screensaver is for?
 
-Sure, but screensavers are a deprecated feature of Windows, and while they still exist, they are subject to removal at Microsoft's discretion. Further, Midnight Sentinel is dismissed by double-clicking the mouse; this protects your the process from being disrupted by curious, roaming cats.
+Sure, but screensavers are a deprecated feature of Windows, and while they still exist, they are subject to removal at Microsoft's discretion. Further, Midnight Sentinel is dismissed by double-clicking the mouse; this protects the process from being disrupted by curious, roaming cats.
 
 ### Can't I just turn off my monitors?
 
 Yep, that's an option. The power buttons on my monitors are annoying to operate, and that's why I made this app. Additionally, you typically can't just turn off a laptop monitor if you're lucky enough to have one with an OLED screen.
 
-> *\*OLED screens don't actually burn-in. The individual pixels have a maximum lumanence that diminishes with use; the brighter the pixel, the faster it diminishes. With prolonged illumination in certain areas, pixels will diminish unevenly causing a burn-in-like effect.*
+> *\*OLED screens don't actually burn-in. The individual pixels have a maximum luminance that diminishes with use; the brighter the pixel, the faster it diminishes. With prolonged illumination in certain areas, pixels will diminish unevenly causing a burn-in-like effect.*
 
 ## Screenshot
 
-**insert screenshot here**
+<div align="center">
+  <img src="assets/Screenshot.png" alt="Simulated black screen">
+</div>
 
-jkjk. This is just a pure black image. But it's similar to the pure-black overlay that will be placed over your screen!
+jkjk. This is just a pure-black image. But it's similar to the pure-black overlay that will be placed over your screen!
 
 ## Usage
 
@@ -46,4 +52,4 @@ I am always open to feedback and ideas. Feel free to create an issue, or, if you
 
 ## License
 
-Midnight Sentinel is proudly open source under the MIT License. See [LICENSE](License) for details!
+Midnight Sentinel is proudly open source under the MIT License.
