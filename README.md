@@ -23,7 +23,7 @@ Yep, that's an option. The power buttons on my monitors are annoying to operate,
 **insert screenshot here**
 
 <div align="center">
-  <img src="assets/screenshot.png" alt="Simulated black screen">
+  <img src="assets/Screenshot.png" alt="Simulated black screen">
 </div>
 
 jkjk. This is just a pure black image. But it's similar to the pure-black overlay that will be placed over your screen!
