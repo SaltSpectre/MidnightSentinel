@@ -20,8 +20,6 @@ Yep, that's an option. The power buttons on my monitors are annoying to operate,
 
 ## Screenshot
 
-**insert screenshot here**
-
 <div align="center">
   <img src="assets/Screenshot.png" alt="Simulated black screen">
 </div>
