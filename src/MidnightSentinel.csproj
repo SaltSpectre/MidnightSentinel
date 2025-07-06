@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>Resources\MidnightSentinel.ico</ApplicationIcon>
+    <AssemblyName>midsent</AssemblyName>
+    <Product>Midnight Sentinel</Product>
+    <AssemblyTitle>Midnight Sentinel</AssemblyTitle>
+    <AssemblyVersion>1.0.$([System.DateTime]::Now.ToString("yyyy.MMdd"))</AssemblyVersion>
+    <FileVersion>1.0.$([System.DateTime]::Now.ToString("yyyy.MMdd"))</FileVersion>
+    <InformationalVersion>v$([System.DateTime]::Now.ToString("yyyy-MM-dd"))</InformationalVersion>
+    <Company>SaltSpectre</Company>
+    <Copyright>Copyright © $([System.DateTime]::Now.ToString("yyyy")) SaltSpectre</Copyright>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\exit.png" />
+    <EmbeddedResource Include="Resources\systray.png" />
+    <EmbeddedResource Include="Resources\MidnightSentinel.png" />
+    <EmbeddedResource Include="Resources\Name_White.png" />
+    <EmbeddedResource Include="Resources\about.png" />
+    <EmbeddedResource Include="Resources\warning.png" />
+  </ItemGroup>
+</Project>
