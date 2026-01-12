@@ -35,10 +35,6 @@ Download the latest MSI installer for your system architecture:
 - **x64 (Intel/AMD 64-bit)**: `MidnightSentinel-x64.msi`
 - **ARM64 (ARM-based systems)**: `MidnightSentinel-arm64.msi`
 
-Installers are available from:
-- **GitHub Releases**: Attached to each tagged release
-- **GitHub Actions**: Build artifacts from the latest successful workflow run
-
 The MSI installer will:
 - Install Midnight Sentinel to `%LOCALAPPDATA%\Midnight Sentinel` (no admin required)
 - Add the installation directory to your user PATH (so you can run `midsent` from anywhere)
@@ -78,8 +74,6 @@ When calling `midsent` (or `midsent.exe`) with the `--run-now` argument, the ove
 ```cmd
 midsent --run-now
 ```
-
-Note: If you installed via MSI, `midsent` is available from any command prompt or PowerShell window since it's automatically added to your PATH.
 
 ## Conclusion
 

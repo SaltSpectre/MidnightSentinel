@@ -55,7 +55,7 @@ For ARM64, replace `x64` with `arm64` in steps 2, 4, and 5.
 
 ## Installer Features
 
-- **Install Location**: `%LOCALAPPDATA%\Midnight Sentinel\` (per-user, no admin required)
+- **Install Location**: `%LOCALAPPDATA%\SaltSpectre\Midnight Sentinel\` (or `%ProgramFiles%\SaltSpectre\Midnight Sentinel\`)
 - **Start Menu Shortcuts**: Application launcher and uninstaller
 - **PATH Environment Variable**: Adds installation directory to user PATH for command-line access
 - **Upgrade Support**: Automatically upgrades previous versions
@@ -68,9 +68,6 @@ The installer uses per-user installation by default, which:
 - Does not require administrator privileges
 - Installs to the current user's AppData folder
 - Only adds to the current user's PATH environment variable
-- Can be installed without IT department approval in most enterprise environments
-
-Simply double-click the MSI file and follow the prompts - no "Run as Administrator" needed!
 
 ## Configuration Files
 

@@ -41,10 +41,14 @@
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="LocalAppDataFolder">
-        <Directory Id="INSTALLFOLDER" Name="Midnight Sentinel" />
+        <Directory Id="ManufacturerFolder" Name="SaltSpectre">
+          <Directory Id="INSTALLFOLDER" Name="Midnight Sentinel" />
+        </Directory>
       </Directory>
       <Directory Id="ProgramMenuFolder">
-        <Directory Id="ApplicationProgramsFolder" Name="Midnight Sentinel" />
+        <Directory Id="ManufacturerProgramsFolder" Name="SaltSpectre">
+          <Directory Id="ApplicationProgramsFolder" Name="Midnight Sentinel" />
+        </Directory>
       </Directory>
     </Directory>
   </Fragment>
