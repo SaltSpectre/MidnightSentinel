@@ -26,6 +26,42 @@ Yep, that's an option. The power buttons on my monitors are annoying to operate,
 
 jkjk. This is just a pure-black image. But it's similar to the pure-black overlay that will be placed over your screen!
 
+## Installation
+
+### Option 1: Download MSI Installer (Recommended)
+
+Download the latest MSI installer for your system architecture:
+
+- **x64 (Intel/AMD 64-bit)**: `MidnightSentinel-x64.msi`
+- **ARM64 (ARM-based systems)**: `MidnightSentinel-arm64.msi`
+
+Installers are available from:
+- **GitHub Releases**: Attached to each tagged release
+- **GitHub Actions**: Build artifacts from the latest successful workflow run
+
+The MSI installer will:
+- Install Midnight Sentinel to `C:\Program Files\Midnight Sentinel`
+- Create Start Menu shortcuts
+- Allow easy uninstallation via Windows Settings
+
+### Option 2: Build from Source
+
+Requirements:
+- .NET 9.0 SDK or later
+- Windows 10/11
+
+```powershell
+# Clone the repository
+git clone https://github.com/SaltSpectre/MidnightSentinel.git
+cd MidnightSentinel
+
+# Build the application
+cd src
+dotnet build --configuration Release
+```
+
+The compiled executable will be in `src/bin/Release/net9.0-windows/`.
+
 ## Usage
 
 Midnght Sentinel has a couple of ways you can use it. 

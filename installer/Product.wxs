@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?define ProductName = "Midnight Sentinel" ?>
+  <?define ProductVersion = "1.0.0.0" ?>
+  <?define Manufacturer = "SaltSpectre" ?>
+  <?define UpgradeCode = "A9E8B7C6-5D4E-3F2A-1B0C-9D8E7F6A5B4C" ?>
+
+  <Product Id="*"
+           Name="$(var.ProductName)"
+           Language="1033"
+           Version="$(var.ProductVersion)"
+           Manufacturer="$(var.Manufacturer)"
+           UpgradeCode="$(var.UpgradeCode)">
+
+    <Package InstallerVersion="500"
+             Compressed="yes"
+             InstallScope="perMachine"
+             Description="OLED Screen Burn-in Protection"
+             Comments="Midnight Sentinel creates full-screen overlays to protect OLED screens from burn-in" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+    <MediaTemplate EmbedCab="yes" />
+
+    <Feature Id="ProductFeature" Title="Midnight Sentinel" Level="1">
+      <ComponentGroupRef Id="PublishedFiles" />
+      <ComponentRef Id="ApplicationShortcutComponent" />
+    </Feature>
+
+    <Icon Id="ProductIcon" SourceFile="../src/Resources/MidnightSentinel.ico" />
+    <Property Id="ARPPRODUCTICON" Value="ProductIcon" />
+    <Property Id="ARPHELPLINK" Value="https://github.com/SaltSpectre/MidnightSentinel" />
+
+    <UIRef Id="WixUI_Minimal" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+
+  </Product>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFiles64Folder">
+        <Directory Id="INSTALLFOLDER" Name="Midnight Sentinel" />
+      </Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="Midnight Sentinel" />
+      </Directory>
+    </Directory>
+  </Fragment>
+
+  <Fragment>
+    <DirectoryRef Id="ApplicationProgramsFolder">
+      <Component Id="ApplicationShortcutComponent" Guid="B3A4C8D1-2E5F-4A6B-9C7D-8E1F2A3B4C5D">
+        <Shortcut Id="ApplicationStartMenuShortcut"
+                  Name="Midnight Sentinel"
+                  Description="OLED Screen Burn-in Protection"
+                  Target="[INSTALLFOLDER]midsent.exe"
+                  WorkingDirectory="INSTALLFOLDER"
+                  Icon="ProductIcon" />
+        <Shortcut Id="UninstallProduct"
+                  Name="Uninstall Midnight Sentinel"
+                  Description="Uninstalls Midnight Sentinel"
+                  Target="[SystemFolder]msiexec.exe"
+                  Arguments="/x [ProductCode]" />
+        <RemoveFolder Id="CleanUpShortCut" On="uninstall" />
+        <RegistryValue Root="HKCU"
+                       Key="Software\SaltSpectre\MidnightSentinel"
+                       Name="installed"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+
+</Wix>
