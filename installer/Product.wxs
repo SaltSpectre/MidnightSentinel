@@ -15,7 +15,7 @@
 
     <Package InstallerVersion="500"
              Compressed="yes"
-             InstallScope="perMachine"
+             InstallScope="perUser"
              Description="OLED Screen Burn-in Protection"
              Comments="Midnight Sentinel creates full-screen overlays to protect OLED screens from burn-in" />
 
@@ -40,7 +40,7 @@
 
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="ProgramFiles64Folder">
+      <Directory Id="LocalAppDataFolder">
         <Directory Id="INSTALLFOLDER" Name="Midnight Sentinel" />
       </Directory>
       <Directory Id="ProgramMenuFolder">
@@ -83,9 +83,9 @@
                           Permanent="no"
                           Part="last"
                           Action="set"
-                          System="yes" />
+                          System="no" />
         <CreateFolder />
-        <RegistryValue Root="HKLM"
+        <RegistryValue Root="HKCU"
                        Key="Software\SaltSpectre\MidnightSentinel"
                        Name="PathSet"
                        Type="integer"

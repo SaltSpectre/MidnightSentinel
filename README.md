@@ -40,8 +40,8 @@ Installers are available from:
 - **GitHub Actions**: Build artifacts from the latest successful workflow run
 
 The MSI installer will:
-- Install Midnight Sentinel to `C:\Program Files\Midnight Sentinel`
-- Add the installation directory to your system PATH (so you can run `midsent` from anywhere)
+- Install Midnight Sentinel to `%LOCALAPPDATA%\Midnight Sentinel` (no admin required)
+- Add the installation directory to your user PATH (so you can run `midsent` from anywhere)
 - Create Start Menu shortcuts
 - Allow easy uninstallation via Windows Settings
 

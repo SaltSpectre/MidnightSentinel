@@ -55,12 +55,22 @@ For ARM64, replace `x64` with `arm64` in steps 2, 4, and 5.
 
 ## Installer Features
 
-- **Install Location**: `C:\Program Files\Midnight Sentinel\`
+- **Install Location**: `%LOCALAPPDATA%\Midnight Sentinel\` (per-user, no admin required)
 - **Start Menu Shortcuts**: Application launcher and uninstaller
-- **PATH Environment Variable**: Adds installation directory to system PATH for command-line access
+- **PATH Environment Variable**: Adds installation directory to user PATH for command-line access
 - **Upgrade Support**: Automatically upgrades previous versions
 - **Clean Uninstall**: Removes all files, PATH entry, and registry entries
-- **Per-Machine Installation**: Available to all users on the system
+- **Per-User Installation**: No administrator privileges required, installs for current user only
+
+### Installation Notes
+
+The installer uses per-user installation by default, which:
+- Does not require administrator privileges
+- Installs to the current user's AppData folder
+- Only adds to the current user's PATH environment variable
+- Can be installed without IT department approval in most enterprise environments
+
+Simply double-click the MSI file and follow the prompts - no "Run as Administrator" needed!
 
 ## Configuration Files
 
