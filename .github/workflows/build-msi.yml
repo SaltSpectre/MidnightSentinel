@@ -1,0 +1,115 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.VERSION }}
+      msi_version: ${{ steps.version.outputs.MSI_VERSION }}
+      tag: ${{ steps.version.outputs.TAG }}
+    steps:
+    - name: Generate version
+      id: version
+      run: |
+        date=$(date '+%y.%-m.%-d')
+        runNumber=${GITHUB_RUN_NUMBER:-0}
+        version="$date+$runNumber"
+        msi_version="$date.$runNumber"
+        echo "VERSION=$version" >> $GITHUB_OUTPUT
+        echo "MSI_VERSION=$msi_version" >> $GITHUB_OUTPUT
+        echo "TAG=v$version" >> $GITHUB_OUTPUT
+        echo "Generated version: $version"
+        echo "Generated MSI version: $msi_version"
+
+  build-msi:
+    needs: generate-version
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        arch: [x64, arm64]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+
+    - name: Inject version
+      run: |
+        $version = "${{ needs.generate-version.outputs.version }}"
+        (Get-Content "src/VersionInfo.cs") -replace 'Version = ".*"', "Version = `"$version`"" | Set-Content "src/VersionInfo.cs"
+
+    - name: Restore dependencies
+      run: dotnet restore src/MidnightSentinel.sln
+
+    - name: Build application
+      run: dotnet build src/MidnightSentinel.sln --configuration Release --no-restore -p:Version=${{ needs.generate-version.outputs.msi_version }}
+
+    - name: Publish application
+      run: dotnet publish src/MidnightSentinel.csproj --configuration Release --runtime win-${{ matrix.arch }} --self-contained true -p:PublishSingleFile=false -p:PublishReadyToRun=true -p:Version=${{ needs.generate-version.outputs.msi_version }} --output publish/${{ matrix.arch }}
+
+    - name: Build MSI
+      run: dotnet build installer/MidnightSentinel.Installer.wixproj --configuration Release -p:Platform=${{ matrix.arch }} -p:Version=${{ needs.generate-version.outputs.msi_version }}
+
+    - name: Rename MSI
+      run: |
+        $version = "${{ needs.generate-version.outputs.version }}"
+        $arch = "${{ matrix.arch }}"
+        Copy-Item "installer/bin/$arch/Release/MidnightSentinel-$arch.msi" "MidnightSentinel-$arch-$version.msi"
+        echo "MSI_NAME=MidnightSentinel-$arch-$version.msi" >> $env:GITHUB_ENV
+
+    - name: Upload MSI artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: MidnightSentinel-${{ matrix.arch }}-msi
+        path: ${{ env.MSI_NAME }}
+        retention-days: 90
+
+  create-release:
+    needs: [generate-version, build-msi]
+    runs-on: ubuntu-latest
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+
+    - name: Create GitHub release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ needs.generate-version.outputs.tag }}
+        name: "Release ${{ needs.generate-version.outputs.version }}"
+        body: |
+          🌙 **Midnight Sentinel ${{ needs.generate-version.outputs.version }}**
+          
+          OLED Screen Burn-in Protection
+          
+          Automated release built from commit ${{ github.sha }}
+          
+          **Downloads:**
+          - `MidnightSentinel-x64-${{ needs.generate-version.outputs.version }}.msi` - **x64 MSI Installer** (Intel/AMD 64-bit)
+          - `MidnightSentinel-arm64-${{ needs.generate-version.outputs.version }}.msi` - **ARM64 MSI Installer** (Windows on ARM)
+          
+          **Installation:**
+          Run the MSI for your architecture. The installer is per-user and does not require administrator privileges.
+          
+        files: artifacts/**/*
+        prerelease: false
+        draft: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -39,21 +39,7 @@ namespace MidnightSentinel
 
         public static string GetVersionString()
         {
-            try
-            {
-                var assembly = Assembly.GetExecutingAssembly();
-                var version = assembly.GetName().Version;
-                if (version != null)
-                {
-                    return $"v{DateTime.Now:yyyy-MM-dd}";
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Error getting version: {ex.Message}");
-            }
-
-            return $"v{DateTime.Now:yyyy-MM-dd}";
+            return $"v{VersionInfo.Version}";
         }
 
         public static WpfColor GetAccentColor()

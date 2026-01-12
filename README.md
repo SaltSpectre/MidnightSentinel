@@ -26,20 +26,53 @@ Yep, that's an option. The power buttons on my monitors are annoying to operate,
 
 jkjk. This is just a pure-black image. But it's similar to the pure-black overlay that will be placed over your screen!
 
+## Installation
+
+### Option 1: Download MSI Installer (Recommended)
+
+Download the latest MSI installer for your system architecture:
+
+- **x64 (Intel/AMD 64-bit)**: `MidnightSentinel-x64.msi`
+- **ARM64 (ARM-based systems)**: `MidnightSentinel-arm64.msi`
+
+The MSI installer will:
+- Install Midnight Sentinel to `%LOCALAPPDATA%\Midnight Sentinel` (no admin required)
+- Add the installation directory to your user PATH (so you can run `midsent` from anywhere)
+- Create Start Menu shortcuts
+- Allow easy uninstallation via Windows Settings
+
+### Option 2: Build from Source
+
+Requirements:
+- .NET 9.0 SDK or later
+- Windows 10/11
+
+```powershell
+# Clone the repository
+git clone https://github.com/SaltSpectre/MidnightSentinel.git
+cd MidnightSentinel
+
+# Build the application
+cd src
+dotnet build --configuration Release
+```
+
+The compiled executable will be in `src/bin/Release/net9.0-windows/`.
+
 ## Usage
 
-Midnght Sentinel has a couple of ways you can use it. 
+Midnght Sentinel has a couple of ways you can use it.
 
 ### Standard Mode
 
 First, is by executing the application and double-clicking on the System Tray icon to initiate the overlays. Double-click again (anywhere!--You won't see your mouse because it's hidden) and the overlays are dismissed. The app will continue to live in your tray to be called at your leisure.
 
-### Advanced Mode
+### Advanced Mode (Command Line)
 
-When calling `midsent.exe` with the `--run-now` argument, the overlays will immediately initiate. Dismissal is the same (double-clicking), but the app won't continue running after the overlays are dismissed. This is intended for programatic use (such as with AutoHotKey) or if your keyboard, mouse, or other device can be programmed to execute an application.
+When calling `midsent` (or `midsent.exe`) with the `--run-now` argument, the overlays will immediately initiate. Dismissal is the same (double-clicking), but the app won't continue running after the overlays are dismissed. This is intended for programatic use (such as with AutoHotKey) or if your keyboard, mouse, or other device can be programmed to execute an application.
 
 ```cmd
-midsent.exe --run-now
+midsent --run-now
 ```
 
 ## Conclusion
