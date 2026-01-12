@@ -41,6 +41,7 @@ Installers are available from:
 
 The MSI installer will:
 - Install Midnight Sentinel to `C:\Program Files\Midnight Sentinel`
+- Add the installation directory to your system PATH (so you can run `midsent` from anywhere)
 - Create Start Menu shortcuts
 - Allow easy uninstallation via Windows Settings
 
@@ -64,19 +65,21 @@ The compiled executable will be in `src/bin/Release/net9.0-windows/`.
 
 ## Usage
 
-Midnght Sentinel has a couple of ways you can use it. 
+Midnght Sentinel has a couple of ways you can use it.
 
 ### Standard Mode
 
 First, is by executing the application and double-clicking on the System Tray icon to initiate the overlays. Double-click again (anywhere!--You won't see your mouse because it's hidden) and the overlays are dismissed. The app will continue to live in your tray to be called at your leisure.
 
-### Advanced Mode
+### Advanced Mode (Command Line)
 
-When calling `midsent.exe` with the `--run-now` argument, the overlays will immediately initiate. Dismissal is the same (double-clicking), but the app won't continue running after the overlays are dismissed. This is intended for programatic use (such as with AutoHotKey) or if your keyboard, mouse, or other device can be programmed to execute an application.
+When calling `midsent` (or `midsent.exe`) with the `--run-now` argument, the overlays will immediately initiate. Dismissal is the same (double-clicking), but the app won't continue running after the overlays are dismissed. This is intended for programatic use (such as with AutoHotKey) or if your keyboard, mouse, or other device can be programmed to execute an application.
 
 ```cmd
-midsent.exe --run-now
+midsent --run-now
 ```
+
+Note: If you installed via MSI, `midsent` is available from any command prompt or PowerShell window since it's automatically added to your PATH.
 
 ## Conclusion
 

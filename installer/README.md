@@ -57,8 +57,9 @@ For ARM64, replace `x64` with `arm64` in steps 2, 4, and 5.
 
 - **Install Location**: `C:\Program Files\Midnight Sentinel\`
 - **Start Menu Shortcuts**: Application launcher and uninstaller
+- **PATH Environment Variable**: Adds installation directory to system PATH for command-line access
 - **Upgrade Support**: Automatically upgrades previous versions
-- **Clean Uninstall**: Removes all files and registry entries
+- **Clean Uninstall**: Removes all files, PATH entry, and registry entries
 - **Per-Machine Installation**: Available to all users on the system
 
 ## Configuration Files

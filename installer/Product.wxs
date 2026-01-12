@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
   <?define ProductName = "Midnight Sentinel" ?>
   <?define ProductVersion = "1.0.0.0" ?>
   <?define Manufacturer = "SaltSpectre" ?>
@@ -25,6 +26,7 @@
     <Feature Id="ProductFeature" Title="Midnight Sentinel" Level="1">
       <ComponentGroupRef Id="PublishedFiles" />
       <ComponentRef Id="ApplicationShortcutComponent" />
+      <ComponentRef Id="PathEnvironmentComponent" />
     </Feature>
 
     <Icon Id="ProductIcon" SourceFile="../src/Resources/MidnightSentinel.ico" />
@@ -65,6 +67,27 @@
         <RegistryValue Root="HKCU"
                        Key="Software\SaltSpectre\MidnightSentinel"
                        Name="installed"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+
+  <Fragment>
+    <DirectoryRef Id="INSTALLFOLDER">
+      <Component Id="PathEnvironmentComponent" Guid="C5D6E7F8-9A0B-1C2D-3E4F-5A6B7C8D9E0F">
+        <util:Environment Id="PathEnvironment"
+                          Name="PATH"
+                          Value="[INSTALLFOLDER]"
+                          Permanent="no"
+                          Part="last"
+                          Action="set"
+                          System="yes" />
+        <CreateFolder />
+        <RegistryValue Root="HKLM"
+                       Key="Software\SaltSpectre\MidnightSentinel"
+                       Name="PathSet"
                        Type="integer"
                        Value="1"
                        KeyPath="yes" />
