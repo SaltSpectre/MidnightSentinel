@@ -17,10 +17,32 @@
 
     <MediaTemplate EmbedCab="yes" />
 
-    <Feature Id="ProductFeature" Title="Midnight Sentinel" Level="1">
+    <Feature Id="ProductFeature" 
+             Title="Midnight Sentinel" 
+             Level="1" 
+             Display="expand" 
+             ConfigurableDirectory="INSTALLFOLDER"
+             AllowAbsent="no"
+             AllowAdvertise="no"
+             Description="The main Midnight Sentinel application (required).">
       <ComponentGroupRef Id="PublishedFiles" />
       <ComponentRef Id="ApplicationShortcutComponent" />
-      <ComponentRef Id="PathEnvironmentComponent" />
+      
+      <Feature Id="PathFeature" 
+               Title="PATH Registration" 
+               Level="1"
+               AllowAdvertise="no"
+               Description="Adds Midnight Sentinel to your PATH environment variable for easy command-line access.">
+        <ComponentRef Id="PathEnvironmentComponent" />
+      </Feature>
+      
+      <Feature Id="AutoStartFeature" 
+               Title="Auto start at logon" 
+               Level="1"
+               AllowAdvertise="no"
+               Description="Automatically starts Midnight Sentinel when you log in to Windows.">
+        <ComponentRef Id="AutoStartComponent" />
+      </Feature>
     </Feature>
 
     <Icon Id="ProductIcon" SourceFile="../src/Resources/MidnightSentinel.ico" />
@@ -28,7 +50,7 @@
     <Property Id="ARPHELPLINK" Value="https://github.com/SaltSpectre/MidnightSentinel" />
 
     <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
-    <ui:WixUI Id="WixUI_InstallDir" />
+    <ui:WixUI Id="WixUI_FeatureTree" />
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
 
     <StandardDirectory Id="LocalAppDataFolder">
@@ -87,6 +109,19 @@
                        Name="PathSet"
                        Type="integer"
                        Value="1"
+                       KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+
+  <Fragment>
+    <DirectoryRef Id="INSTALLFOLDER">
+      <Component Id="AutoStartComponent" Guid="D6E7F8A9-0B1C-2D3E-4F5A-6B7C8D9E0F1A">
+        <RegistryValue Root="HKCU"
+                       Key="Software\Microsoft\Windows\CurrentVersion\Run"
+                       Name="MidnightSentinel"
+                       Type="string"
+                       Value="&quot;[INSTALLFOLDER]midsent.exe&quot;"
                        KeyPath="yes" />
       </Component>
     </DirectoryRef>
