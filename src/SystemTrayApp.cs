@@ -65,7 +65,7 @@ namespace MidnightSentinel
 
             trayIcon = new NotifyIcon()
             {
-                Text = "Midnight Sentinel",
+                Text = "Midnight Sentinel (" + WindowHelpers.GetVersionString() + ")",
                 Icon = icon,
                 ContextMenuStrip = trayMenu,
                 Visible = true,
