@@ -1,7 +1,9 @@
 name: Build and Release
 
 on:
-  workflow_dispatch:
+    pull_request:
+      branches: [ main ]
+    workflow_dispatch:
 
 permissions:
   contents: write
@@ -88,19 +90,15 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ needs.generate-version.outputs.tag }}
-        name: "Midnight Sentinel ${{ needs.generate-version.outputs.version }}"
+        name: "🌙 Midnight Sentinel ${{ needs.generate-version.outputs.version }}"
         body: |
-          🌙 **Midnight Sentinel ${{ needs.generate-version.outputs.version }}**
+          *Automated release built from commit ${{ github.sha }}*
           
-          OLED Screen Burn-in Protection
-          
-          Automated release built from commit ${{ github.sha }}
-          
-          **Downloads:**
+          ## Downloads:
           - `MidnightSentinel-x64-${{ needs.generate-version.outputs.version }}.msi` - **x64 MSI Installer** (Intel/AMD 64-bit)
-          - `MidnightSentinel-arm64-${{ needs.generate-version.outputs.version }}.msi` - **ARM64 MSI Installer** (Windows on ARM)
+          - `MidnightSentinel-arm64-${{ needs.generate-version.outputs.version }}.msi` - **ARM64 MSI Installer** (Windows on ARM64 devices and Apple silicon)
           
-          **Installation:**
+          ## Installation:
           Run the MSI for your architecture. The installer is per-user and does not require administrator privileges.
           
         files: artifacts/**/*
