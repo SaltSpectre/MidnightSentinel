@@ -38,10 +38,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: '9.0.x'
 
@@ -70,7 +70,7 @@ jobs:
         echo "MSI_NAME=MidnightSentinel-$arch-$version.msi" >> $env:GITHUB_ENV
 
     - name: Upload MSI artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: MidnightSentinel-${{ matrix.arch }}-msi
         path: ${{ env.MSI_NAME }}
@@ -82,12 +82,12 @@ jobs:
 
     steps:
     - name: Download all artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
         path: artifacts
 
     - name: Create GitHub release
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@v3
       with:
         tag_name: ${{ needs.generate-version.outputs.tag }}
         name: "🌙 Midnight Sentinel ${{ needs.generate-version.outputs.version }}"
