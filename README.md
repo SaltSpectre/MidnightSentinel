@@ -36,23 +36,30 @@ jkjk. This is just a pure-black image. But it's similar to the pure-black overla
 
 ## Installation
 
-### Option 1: Download MSI Installer (Recommended)
+### Option 1: Download Installer (Recommended)
 
-> [!NOTE]
-> The installer is being reworked to match the new Rust-based build and isn't available yet for this version. Build from source (below) in the meantime.
+Download `MidnightSentinel-Universal-{version}.exe` from the [latest release](https://github.com/SaltSpectre/MidnightSentinel/releases/latest) and run it. It's a single installer covering both x64 and ARM64 systems — it detects your system's architecture and installs the matching binaries automatically.
 
-Download the latest MSI installer for your system architecture:
-
-- **x64 (Intel/AMD 64-bit)**: `MidnightSentinel-x64.msi`
-- **ARM64 (ARM-based systems)**: `MidnightSentinel-arm64.msi`
-
-The MSI installer will:
-- Install Midnight Sentinel to `%LOCALAPPDATA%\Midnight Sentinel` (no admin required)
-- Add the installation directory to your user PATH
+The installer will:
+- Install Midnight Sentinel to `%LOCALAPPDATA%\SaltSpectre\Midnight Sentinel` (no admin required)
 - Create Start Menu shortcuts
+- Optionally add the installation directory to your user PATH (selected by default)
+- Optionally start Midnight Sentinel automatically at logon (selected by default)
 - Allow easy uninstallation via Windows Settings
 
-### Option 2: Build from Source
+> [!WARNING]
+> If you have a version from **26.1.15+24 or earlier** installed (built with the old MSI-based installer), uninstall it first via Settings > Apps before installing this version. The new installer uses different installer technology and can't upgrade or remove the old one automatically — it will warn you if it detects the old install still present, but can't do anything about it for you.
+
+### Option 2: Portable (No Installer)
+
+Prefer not to install anything? Download the portable ZIP for your architecture from the [latest release](https://github.com/SaltSpectre/MidnightSentinel/releases/latest):
+
+- `MidnightSentinel-Portable-x64-{version}.zip`
+- `MidnightSentinel-Portable-arm64-{version}.zip`
+
+Unzip it anywhere and run `midsent.exe`/`midsentcli.exe` directly from there. No install, no PATH or registry changes, no admin — just the two executables, which you can delete whenever you like.
+
+### Option 3: Build from Source
 
 Requirements:
 - [Rust](https://rustup.rs/) (stable toolchain)
