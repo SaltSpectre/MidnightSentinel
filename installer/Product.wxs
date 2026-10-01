@@ -45,7 +45,7 @@
       </Feature>
     </Feature>
 
-    <Icon Id="ProductIcon" SourceFile="../src/Resources/MidnightSentinel.ico" />
+    <Icon Id="ProductIcon" SourceFile="../src/controller/resources/MidnightSentinel.ico" />
     <Property Id="ARPPRODUCTICON" Value="ProductIcon" />
     <Property Id="ARPHELPLINK" Value="https://github.com/SaltSpectre/MidnightSentinel" />
 
