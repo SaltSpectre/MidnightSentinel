@@ -34,30 +34,43 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        arch: [x64, arm64]
+        include:
+          - arch: x64
+            rust_target: x86_64-pc-windows-msvc
+          - arch: arm64
+            rust_target: aarch64-pc-windows-msvc
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
+
+    - name: Setup Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: ${{ matrix.rust_target }}
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
       with:
         dotnet-version: '9.0.x'
 
-    - name: Inject version
+    - name: Stamp version into Cargo.toml
+      shell: pwsh
       run: |
         $version = "${{ needs.generate-version.outputs.version }}"
-        (Get-Content "src/VersionInfo.cs") -replace 'Version = ".*"', "Version = `"$version`"" | Set-Content "src/VersionInfo.cs"
-
-    - name: Restore dependencies
-      run: dotnet restore src/MidnightSentinel.sln
+        (Get-Content "src/Cargo.toml") -replace 'version = "[^"]*"', "version = `"$version`"" | Set-Content "src/Cargo.toml"
 
     - name: Build application
-      run: dotnet build src/MidnightSentinel.sln --configuration Release --no-restore -p:Version=${{ needs.generate-version.outputs.msi_version }}
+      run: cargo build --release --workspace --target ${{ matrix.rust_target }} --manifest-path src/Cargo.toml
 
-    - name: Publish application
-      run: dotnet publish src/MidnightSentinel.csproj --configuration Release --runtime win-${{ matrix.arch }} --self-contained true -p:PublishSingleFile=false -p:PublishReadyToRun=true -p:Version=${{ needs.generate-version.outputs.msi_version }} --output publish/${{ matrix.arch }}
+    - name: Stage published files
+      shell: pwsh
+      run: |
+        $stageDir = "publish/${{ matrix.arch }}"
+        New-Item -ItemType Directory -Path $stageDir -Force | Out-Null
+        $binDir = "src/target/${{ matrix.rust_target }}/release"
+        Copy-Item "$binDir/midsent.exe" $stageDir
+        Copy-Item "$binDir/midsentcli.exe" $stageDir
 
     - name: Build MSI
       run: dotnet build installer/MidnightSentinel.Installer.wixproj --configuration Release -p:Platform=${{ matrix.arch }} -p:Version=${{ needs.generate-version.outputs.msi_version }}
