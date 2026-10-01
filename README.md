@@ -83,13 +83,19 @@ Calling `midsent.exe --run-now` skips the tray entirely and toggles the overlay 
 
 ### `midsentcli.exe`: Standalone Overlay
 
-`midsentcli.exe` toggles the overlay immediately on launch — with no flags required — raising it if it's not active, or dismissing it (same double-click-anywhere gesture) if it already is. It's a fully independent executable, so it can be launched directly by a script, a keyboard/mouse macro tool (such as AutoHotKey), or any third-party controller — with or without `midsent.exe` running.
+`midsentcli.exe` is a fully independent executable that can be launched directly by a script, a keyboard/mouse macro tool (such as AutoHotKey), or any third-party controller — with or without `midsent.exe` running. It accepts one optional, mutually exclusive flag:
+
+- No flag, or `--toggle`: raise the overlay if it's not active, or dismiss it (same double-click-anywhere gesture) if it already is. Prints nothing beyond error messages.
+- `--start`: make sure the overlay is active. Prints the PID of the process that owns it — either this one, or an already-running one — to stdout, so a script can monitor it.
+- `--stop`: make sure the overlay is **not** active, dismissing it if needed. Prints human-readable feedback and exits with `0` if an overlay was found and dismissed, or non-zero if none was active.
 
 ```cmd
 midsentcli.exe
+midsentcli.exe --start
+midsentcli.exe --stop
 ```
 
-Only one overlay display can be active at a time, regardless of which of the three ways above was used to raise or dismiss it.
+Only one overlay display can be active at a time, regardless of which of the three ways above (tray, `--run-now`, or `midsentcli.exe`) was used to raise or dismiss it.
 
 ## Conclusion
 

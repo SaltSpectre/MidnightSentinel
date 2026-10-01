@@ -19,10 +19,10 @@ use windows::Win32::Graphics::Gdi::{
 use windows::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows::Win32::UI::WindowsAndMessaging::{
     CreateWindowExW, DefWindowProcW, DestroyWindow, DispatchMessageW, FindWindowW, GetMessageW,
-    PostMessageW, PostQuitMessage, RegisterClassW, RegisterWindowMessageW, SetCursor,
-    SetForegroundWindow, ShowCursor, ShowWindow, TranslateMessage, CS_DBLCLKS, MSG, SW_SHOW,
-    WM_DESTROY, WM_LBUTTONDBLCLK, WM_MBUTTONDBLCLK, WM_RBUTTONDBLCLK, WM_SETCURSOR, WNDCLASSW,
-    WS_EX_TOPMOST, WS_POPUP,
+    GetWindowThreadProcessId, PostMessageW, PostQuitMessage, RegisterClassW,
+    RegisterWindowMessageW, SetCursor, SetForegroundWindow, ShowCursor, ShowWindow,
+    TranslateMessage, CS_DBLCLKS, MSG, SW_SHOW, WM_DESTROY, WM_LBUTTONDBLCLK, WM_MBUTTONDBLCLK,
+    WM_RBUTTONDBLCLK, WM_SETCURSOR, WNDCLASSW, WS_EX_TOPMOST, WS_POPUP,
 };
 
 /// Name of the named OS mutex that guards "only one overlay display active
@@ -138,7 +138,7 @@ pub fn run_overlay() {
 /// Asks an already-running overlay to dismiss itself, exactly as if it had
 /// been double-clicked — regardless of whether it's running in this
 /// process (e.g. the tray controller's background thread) or a different
-/// one (e.g. a previously-launched `MidSent_CLI`). Returns `true` if a
+/// one (e.g. a previously-launched `midsentcli`). Returns `true` if a
 /// running overlay was found and asked to dismiss.
 pub fn dismiss_running_overlay() -> bool {
     unsafe {
@@ -147,6 +147,19 @@ pub fn dismiss_running_overlay() -> bool {
         };
         let _ = PostMessageW(Some(hwnd), dismiss_message_id(), WPARAM(0), LPARAM(0));
         true
+    }
+}
+
+/// Returns the process ID that owns the currently-running overlay, if any
+/// — regardless of which process/thread created it. Used by `midsentcli
+/// --start` to report a PID to monitor even when the overlay turns out to
+/// already be running somewhere else.
+pub fn running_overlay_pid() -> Option<u32> {
+    unsafe {
+        let hwnd = FindWindowW(WINDOW_CLASS_NAME, None).ok()?;
+        let mut pid = 0u32;
+        GetWindowThreadProcessId(hwnd, Some(&mut pid));
+        Some(pid)
     }
 }
 
