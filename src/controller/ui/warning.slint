@@ -1,0 +1,60 @@
+import { Button } from "std-widgets.slint";
+
+export component WarningDialog inherits Window {
+    title: "Warning - Midnight Sentinel";
+    width: 500px;
+    height: 180px;
+    no-frame: true;
+    background: transparent;
+
+    in property <string> message: "Placeholder message.";
+
+    callback close-requested();
+
+    Rectangle {
+        background: #1e1e1e;
+        border-color: #404040;
+        border-width: 1px;
+        border-radius: 10px;
+
+        HorizontalLayout {
+            padding: 20px;
+            spacing: 15px;
+
+            Image {
+                source: @image-url("../resources/warning.png");
+                width: 120px;
+                height: 120px;
+            }
+
+            VerticalLayout {
+                alignment: center;
+                spacing: 8px;
+
+                Text {
+                    text: "Midnight Sentinel: Error!";
+                    font-size: 18px;
+                    font-weight: 500;
+                    color: red;
+                    horizontal-alignment: center;
+                    wrap: word-wrap;
+                }
+
+                Text {
+                    text: root.message;
+                    font-size: 18px;
+                    font-weight: 500;
+                    color: white;
+                    horizontal-alignment: center;
+                    wrap: word-wrap;
+                }
+
+                Button {
+                    text: "Acknowledge";
+                    primary: true;
+                    clicked => { root.close-requested(); }
+                }
+            }
+        }
+    }
+}
