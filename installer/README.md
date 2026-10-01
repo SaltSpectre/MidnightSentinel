@@ -1,113 +1,110 @@
-# Midnight Sentinel MSI Installer
+# Midnight Sentinel Installer
 
-This directory contains the WiX Toolset v4 configuration for building MSI installers for Midnight Sentinel.
+This directory contains the [Inno Setup](https://jrsoftware.org/isinfo.php) configuration for building Midnight Sentinel's Windows installer, plus portable (no-installer) ZIP distributions.
 
 ## Automated Builds
 
-MSI installers are automatically built by GitHub Actions for both x64 and ARM64 architectures whenever:
+The installer and portable ZIPs are automatically built by GitHub Actions whenever:
 
-- Code is pushed to `main` or `develop` branches
 - A pull request is opened against `main`
-- A tag starting with `v` is created (e.g., `v1.0.0`)
 - The workflow is manually triggered
 
 ### Build Artifacts
 
 The workflow produces:
-- `MidnightSentinel-x64.msi` - Installer for x64 (64-bit Intel/AMD) systems
-- `MidnightSentinel-arm64.msi` - Installer for ARM64 systems
+- `MidnightSentinel-Universal-{version}.exe` - A single installer covering both x64 and ARM64 systems
+- `MidnightSentinel-Portable-x64-{version}.zip` - No installer; just `midsent.exe`/`midsentcli.exe` for x64
+- `MidnightSentinel-Portable-arm64-{version}.zip` - No installer; just `midsent.exe`/`midsentcli.exe` for ARM64
 
 Artifacts are:
 - Uploaded to GitHub Actions (retained for 90 days)
-- Automatically attached to GitHub releases when a version tag is pushed
+- Automatically attached to a (draft) GitHub release
 
 ## Manual Building
 
 ### Prerequisites
 
-1. **.NET 9.0 SDK** - Download from https://dot.net
+1. **Rust** (stable toolchain) - Install via https://rustup.rs/
+2. **Inno Setup 6.3+** (7 also works) - Download from https://jrsoftware.org/isdl.php
+
+To cross-compile the ARM64 binaries too, also run `rustup target add aarch64-pc-windows-msvc`.
 
 ### Build Steps
 
 ```powershell
-# 1. Restore and build the application
-dotnet restore ../src/MidnightSentinel.sln
-dotnet build ../src/MidnightSentinel.sln --configuration Release
+# 1. Build the application (from the repo root)
+cd src
+cargo build --release --workspace
+cargo build --release --workspace --target aarch64-pc-windows-msvc
+cd ..
 
-# 2. Publish for target architecture (x64 or arm64)
-dotnet publish ../src/MidnightSentinel.csproj --configuration Release --runtime win-x64 --self-contained true -p:PublishSingleFile=false --output ../publish/x64
+# 2. Stage the built executables for each architecture
+New-Item -ItemType Directory -Path publish/x64, publish/arm64 -Force
+Copy-Item src/target/release/midsent.exe, src/target/release/midsentcli.exe publish/x64
+Copy-Item src/target/aarch64-pc-windows-msvc/release/midsent.exe, src/target/aarch64-pc-windows-msvc/release/midsentcli.exe publish/arm64
 
-# 3. Build MSI (WiX SDK is restored automatically)
-dotnet build MidnightSentinel.Installer.wixproj --configuration Release -p:Platform=x64
+# 3. Build the installer (from this directory)
+cd installer
+& "C:\Program Files\Inno Setup 7\ISCC.exe" /DMyAppVersion=0.0.0-local MidnightSentinel.iss
 ```
 
-For ARM64, replace `x64` with `arm64` in steps 2 and 3.
+The compiled installer is written to `installer/bin/MidnightSentinel-Universal-0.0.0-local.exe`.
+
+If you only need one architecture, you can skip building/staging the other — the `[Files]` entries for a missing architecture just won't be compiled in, but then that architecture's install will be broken, so build both if you intend to distribute the result.
+
+### Building the portable ZIPs manually
+
+```powershell
+Compress-Archive -Path publish/x64/midsent.exe, publish/x64/midsentcli.exe -DestinationPath MidnightSentinel-Portable-x64-0.0.0-local.zip
+Compress-Archive -Path publish/arm64/midsent.exe, publish/arm64/midsentcli.exe -DestinationPath MidnightSentinel-Portable-arm64-0.0.0-local.zip
+```
 
 ## Installer Features
 
-- **Install Location**: `%LOCALAPPDATA%\SaltSpectre\Midnight Sentinel\` (or `%ProgramFiles%\SaltSpectre\Midnight Sentinel\`)
+- **Universal**: one installer for both x64 and ARM64; it detects the running system's architecture (via Inno's `IsArm64` check) and installs the matching binaries
+- **Install Location**: `%LOCALAPPDATA%\SaltSpectre\Midnight Sentinel\`
 - **Start Menu Shortcuts**: Application launcher and uninstaller
-- **PATH Environment Variable**: Adds installation directory to user PATH for command-line access
-- **Upgrade Support**: Automatically upgrades previous versions
-- **Clean Uninstall**: Removes all files, PATH entry, and registry entries
+- **Optional Tasks** (selectable during install, both checked by default):
+  - Add the install directory to your user `PATH`
+  - Start Midnight Sentinel automatically at logon
+- **Clean Uninstall**: Removes all files, the `PATH` entry (if added), and the autostart registry entry (if added)
 - **Per-User Installation**: No administrator privileges required, installs for current user only
-
-### Installation Notes
-
-The installer uses per-user installation by default, which:
-- Does not require administrator privileges
-- Installs to the current user's AppData folder
-- Only adds to the current user's PATH environment variable
-
-## Configuration Files
-
-- **Product.wxs**: Main installer configuration
-  - Product information (name, version, manufacturer)
-  - Directory structure
-  - Start menu shortcuts
-  - Upgrade logic
-
-- **HarvestedFiles.wxs**: Auto-generated file list
-  - Created by WiX Heat tool
-  - Contains all files from the publish directory
-  - Regenerated for each build
+- **Legacy install detection**: if the old MSI-based installer (version `26.1.15+24` or earlier) is detected, the installer warns the user and lets them cancel to uninstall it first, since the two installer technologies don't recognize each other's installations
 
 ## Versioning
 
-Versioning is automatically generated by the GitHub Actions build. It does not need to be updated manually.
+Versioning is automatically generated by the GitHub Actions build (a `YY.M.D+run-number` scheme) and is:
+- Passed to Inno Setup via the `/DMyAppVersion=...` command-line define, which becomes the installer's `AppVersion` and is baked into the output filename
+- Stamped into `src/Cargo.toml`'s workspace version before building, so the app's About dialog reflects it too
 
-## Upgrade Code
+It does not need to be updated manually.
 
-The `UpgradeCode` GUID in Product.wxs is permanent and should **NEVER** be changed:
+## AppId
 
-```xml
-<?define UpgradeCode = "A9E8B7C6-5D4E-3F2A-1B0C-9D8E7F6A5B4C" ?>
+The `AppId` GUID in `MidnightSentinel.iss` is permanent and should **NEVER** be changed:
+
+```ini
+AppId={{963e3742-47e5-4799-91d8-49b0cbf2b67c}
 ```
 
-This GUID links all versions of the product together for upgrade detection. Changing it will prevent automatic upgrades.
+This is how Inno Setup recognizes an existing installation to upgrade in place on subsequent installs. Changing it will cause future installs to no longer detect the previous one. Note that it is unrelated to the old MSI installer's `UpgradeCode` — that installer used an entirely different technology (Windows Installer/MSI) that Inno Setup installs don't recognize or interoperate with at all.
 
 ## Troubleshooting
 
-### Build Fails: "Cannot find file"
+### Build fails: "Unable to open file ...\publish\x64\midsent.exe"
 
-Ensure the publish directory exists and contains the application files:
-```powershell
-dir ../publish/x64
-```
+The publish directories must exist and be populated with both architectures' binaries before compiling the script — see "Build Steps" above.
 
-### Heat Fails: "Directory not found"
+### Installer shows the legacy-install warning unexpectedly
 
-The publish directory must be created before running heat:
-```powershell
-dotnet publish ../src/MidnightSentinel.csproj --output ../publish/x64
-```
+This checks for the registry value `HKCU\Software\SaltSpectre\MidnightSentinel\installed`, which the old MSI installer always wrote. If you see this warning but don't actually have the old version installed, that registry value may be an orphaned leftover from a previous uninstall; it's safe to delete manually.
 
-### MSI Install Fails
+### Install/Uninstall issues
 
-Check Windows Event Viewer → Windows Logs → Application for detailed error messages.
+Re-run the installer or uninstaller with `/LOG="somefile.log"` appended to get a detailed log of every step Inno Setup took.
 
 ## References
 
-- [WiX Toolset v4 Documentation](https://wixtoolset.org/docs/v4/)
-- [.NET 9.0 Publishing](https://learn.microsoft.com/dotnet/core/deploying/)
-- [GitHub Actions for .NET](https://docs.github.com/actions/guides/building-and-testing-net)
+- [Inno Setup Documentation](https://jrsoftware.org/ishelp/)
+- [Inno Setup Preprocessor Documentation](https://jrsoftware.org/ispphelp/) (for the `{#MyAppVersion}` substitutions used in the script)
+- [The Rust Programming Language](https://doc.rust-lang.org/book/)

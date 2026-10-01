@@ -1,0 +1,76 @@
+import { Button } from "std-widgets.slint";
+
+export component AboutDialog inherits Window {
+    title: "About Midnight Sentinel";
+    width: 520px;
+    height: 250px;
+    no-frame: true;
+    background: transparent;
+
+    in property <string> version-text;
+
+    callback close-requested();
+    callback open-github();
+
+    Rectangle {
+        background: #1e1e1e;
+        border-color: #404040;
+        border-width: 1px;
+        border-radius: 10px;
+
+        HorizontalLayout {
+            padding: 20px;
+            spacing: 20px;
+
+            Image {
+                source: @image-url("../resources/MidnightSentinel.png");
+                width: 200px;
+                height: 200px;
+            }
+
+            VerticalLayout {
+                alignment: center;
+                spacing: 4px;
+
+                Image {
+                    source: @image-url("../resources/Name_White.png");
+                    height: 40px;
+                    horizontal-alignment: left;
+                }
+
+                Text {
+                    text: root.version-text;
+                    font-size: 12px;
+                    font-italic: true;
+                    color: white;
+                    horizontal-alignment: right;
+                }
+
+                Text {
+                    text: "Copyright © 2026 SaltSpectre";
+                    font-size: 11.5px;
+                    color: #aaaaaa;
+                }
+
+                link-area := TouchArea {
+                    clicked => { root.open-github(); }
+
+                    Text {
+                        text: "https://github.com/SaltSpectre/MidnightSentinel";
+                        font-size: 11.5px;
+                        font-italic: true;
+                        color: link-area.has-hover ? #33b2ff : #0099ff;
+                    }
+                }
+
+                Rectangle { height: 10px; }
+
+                Button {
+                    text: "Close";
+                    primary: true;
+                    clicked => { root.close-requested(); }
+                }
+            }
+        }
+    }
+}

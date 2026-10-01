@@ -1,0 +1,128 @@
+name: Build and Release
+
+on:
+    pull_request:
+      branches: [ main ]
+    workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.VERSION }}
+      tag: ${{ steps.version.outputs.TAG }}
+    steps:
+    - name: Generate version
+      id: version
+      run: |
+        date=$(date '+%y.%-m.%-d')
+        runNumber=${GITHUB_RUN_NUMBER:-0}
+        version="$date+$runNumber"
+        echo "VERSION=$version" >> $GITHUB_OUTPUT
+        echo "TAG=v$version" >> $GITHUB_OUTPUT
+        echo "Generated version: $version"
+
+  build:
+    needs: generate-version
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Setup Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: x86_64-pc-windows-msvc,aarch64-pc-windows-msvc
+
+    - name: Stamp version into Cargo.toml
+      shell: pwsh
+      run: |
+        $version = "${{ needs.generate-version.outputs.version }}"
+        (Get-Content "src/Cargo.toml") -replace 'version = "[^"]*"', "version = `"$version`"" | Set-Content "src/Cargo.toml"
+
+    - name: Build (x64)
+      run: cargo build --release --workspace --target x86_64-pc-windows-msvc --manifest-path src/Cargo.toml
+
+    - name: Build (arm64)
+      run: cargo build --release --workspace --target aarch64-pc-windows-msvc --manifest-path src/Cargo.toml
+
+    - name: Stage published files
+      shell: pwsh
+      run: |
+        New-Item -ItemType Directory -Path publish/x64, publish/arm64 -Force | Out-Null
+        Copy-Item src/target/x86_64-pc-windows-msvc/release/midsent.exe, src/target/x86_64-pc-windows-msvc/release/midsentcli.exe publish/x64
+        Copy-Item src/target/aarch64-pc-windows-msvc/release/midsent.exe, src/target/aarch64-pc-windows-msvc/release/midsentcli.exe publish/arm64
+
+    - name: Build installer
+      uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
+      with:
+        path: installer/MidnightSentinel.iss
+        options: /DMyAppVersion=${{ needs.generate-version.outputs.version }}
+
+    - name: Build portable zips
+      shell: pwsh
+      run: |
+        $version = "${{ needs.generate-version.outputs.version }}"
+        Compress-Archive -Path publish/x64/midsent.exe, publish/x64/midsentcli.exe -DestinationPath "MidnightSentinel-Portable-x64-$version.zip"
+        Compress-Archive -Path publish/arm64/midsent.exe, publish/arm64/midsentcli.exe -DestinationPath "MidnightSentinel-Portable-arm64-$version.zip"
+
+    - name: Rename installer
+      shell: pwsh
+      run: |
+        $version = "${{ needs.generate-version.outputs.version }}"
+        Copy-Item "installer/bin/MidnightSentinel-Universal-$version.exe" "MidnightSentinel-Universal-$version.exe"
+
+    - name: Upload installer artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: MidnightSentinel-Universal-installer
+        path: MidnightSentinel-Universal-${{ needs.generate-version.outputs.version }}.exe
+        retention-days: 90
+
+    - name: Upload portable artifacts
+      uses: actions/upload-artifact@v7
+      with:
+        name: MidnightSentinel-Portable-zips
+        path: |
+          MidnightSentinel-Portable-x64-${{ needs.generate-version.outputs.version }}.zip
+          MidnightSentinel-Portable-arm64-${{ needs.generate-version.outputs.version }}.zip
+        retention-days: 90
+
+  create-release:
+    needs: [generate-version, build]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v8
+      with:
+        path: artifacts
+
+    - name: Create GitHub release
+      uses: softprops/action-gh-release@v3
+      with:
+        tag_name: ${{ needs.generate-version.outputs.tag }}
+        name: "🌙 Midnight Sentinel ${{ needs.generate-version.outputs.version }}"
+        body: |
+          *Automated release built from commit ${{ github.sha }}*
+
+          > [!WARNING]
+          > If you have Midnight Sentinel **26.1.15+24 or earlier** installed (the old MSI-based installer), uninstall it first via **Settings > Apps** before installing this version. The new installer uses different installer technology and cannot upgrade or remove the old MSI install automatically — running both at once can leave duplicate Start Menu entries and PATH entries behind. The new installer will also warn you if it detects the old one still installed.
+
+          ## Downloads:
+          - `MidnightSentinel-Universal-${{ needs.generate-version.outputs.version }}.exe` - **Installer** (x64 and ARM64 in one file; per-user, no administrator privileges required)
+          - `MidnightSentinel-Portable-x64-${{ needs.generate-version.outputs.version }}.zip` - **Portable, x64** (no installer; just the executables)
+          - `MidnightSentinel-Portable-arm64-${{ needs.generate-version.outputs.version }}.zip` - **Portable, ARM64** (no installer; just the executables)
+
+          ## Installation:
+          Run the installer, or unzip the portable download for your architecture and run `midsent.exe` (tray controller) or `midsentcli.exe` (standalone overlay) directly.
+
+        files: artifacts/**/*
+        prerelease: false
+        draft: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
