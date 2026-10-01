@@ -17,13 +17,21 @@ jobs:
     steps:
     - name: Generate version
       id: version
+      shell: pwsh
       run: |
-        date=$(date '+%y.%-m.%-d')
-        runNumber=${GITHUB_RUN_NUMBER:-0}
-        version="$date+$runNumber"
-        echo "VERSION=$version" >> $GITHUB_OUTPUT
-        echo "TAG=v$version" >> $GITHUB_OUTPUT
-        echo "Generated version: $version"
+        # GitHub Actions run numbers are scoped per workflow *file*, so they
+        # reset to 1 whenever the file is renamed. This workflow replaced
+        # build-msi.yml, which had already reached run #24 — add that as a
+        # fixed offset so version/build numbers keep increasing instead of
+        # restarting. Remove this offset (set to 0) if the workflow is ever
+        # renamed again with no need to preserve continuity.
+        $runNumberOffset = 24
+        $date = Get-Date -Format "yy.M.d"
+        $runNumber = ([int]($env:GITHUB_RUN_NUMBER ?? "0")) + $runNumberOffset
+        $version = "$date+$runNumber"
+        echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+        echo "TAG=v$version" >> $env:GITHUB_OUTPUT
+        Write-Output "Generated version: $version"
 
   build:
     needs: generate-version
@@ -31,7 +39,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
 
     - name: Setup Rust
       uses: dtolnay/rust-toolchain@stable
@@ -58,7 +66,7 @@ jobs:
         Copy-Item src/target/aarch64-pc-windows-msvc/release/midsent.exe, src/target/aarch64-pc-windows-msvc/release/midsentcli.exe publish/arm64
 
     - name: Build installer
-      uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
+      uses: Minionguyjpro/Inno-Setup-Action@v1.2.9
       with:
         path: installer/MidnightSentinel.iss
         options: /DMyAppVersion=${{ needs.generate-version.outputs.version }}
