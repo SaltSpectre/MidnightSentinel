@@ -11,19 +11,19 @@
 use std::cell::RefCell;
 use std::sync::OnceLock;
 
-use windows::core::{w, BOOL, PCWSTR};
 use windows::Win32::Foundation::{HWND, LPARAM, LRESULT, RECT, WPARAM};
 use windows::Win32::Graphics::Gdi::{
-    EnumDisplayMonitors, GetStockObject, BLACK_BRUSH, HBRUSH, HDC, HMONITOR,
+    BLACK_BRUSH, EnumDisplayMonitors, GetStockObject, HBRUSH, HDC, HMONITOR,
 };
 use windows::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows::Win32::UI::WindowsAndMessaging::{
-    CreateWindowExW, DefWindowProcW, DestroyWindow, DispatchMessageW, FindWindowW, GetMessageW,
-    GetWindowThreadProcessId, PostMessageW, PostQuitMessage, RegisterClassW,
-    RegisterWindowMessageW, SetCursor, SetForegroundWindow, ShowCursor, ShowWindow,
-    TranslateMessage, CS_DBLCLKS, MSG, SW_SHOW, WM_DESTROY, WM_LBUTTONDBLCLK, WM_MBUTTONDBLCLK,
-    WM_RBUTTONDBLCLK, WM_SETCURSOR, WNDCLASSW, WS_EX_TOPMOST, WS_POPUP,
+    CS_DBLCLKS, CreateWindowExW, DefWindowProcW, DestroyWindow, DispatchMessageW, FindWindowW,
+    GetMessageW, GetWindowThreadProcessId, MSG, PostMessageW, PostQuitMessage, RegisterClassW,
+    RegisterWindowMessageW, SW_SHOW, SetCursor, SetForegroundWindow, ShowCursor, ShowWindow,
+    TranslateMessage, WM_DESTROY, WM_LBUTTONDBLCLK, WM_MBUTTONDBLCLK, WM_RBUTTONDBLCLK,
+    WM_SETCURSOR, WNDCLASSW, WS_EX_TOPMOST, WS_POPUP,
 };
+use windows::core::{BOOL, PCWSTR, w};
 
 /// Name of the named OS mutex that guards "only one overlay display active
 /// at a time". Shared by the standalone binary and by the tray controller's
@@ -183,8 +183,10 @@ unsafe extern "system" fn monitor_enum_proc(
     rect: *mut RECT,
     lparam: LPARAM,
 ) -> BOOL {
-    let rects = &mut *(lparam.0 as *mut Vec<RECT>);
-    rects.push(*rect);
+    unsafe {
+        let rects = &mut *(lparam.0 as *mut Vec<RECT>);
+        rects.push(*rect);
+    }
     BOOL(1)
 }
 
@@ -223,7 +225,7 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
             // Force no cursor every time Windows would otherwise reset it
             // (e.g. on mouse move), rather than relying solely on the
             // global ShowCursor counter.
-            let _ = SetCursor(None);
+            let _ = unsafe { SetCursor(None) };
             LRESULT(1)
         }
         WM_LBUTTONDBLCLK | WM_RBUTTONDBLCLK | WM_MBUTTONDBLCLK => {
@@ -234,10 +236,10 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
             OVERLAY_WINDOWS.with(|windows| windows.borrow_mut().retain(|&h| h != hwnd));
             let remaining = OVERLAY_WINDOWS.with(|windows| windows.borrow().len());
             if remaining == 0 {
-                PostQuitMessage(0);
+                unsafe { PostQuitMessage(0) };
             }
             LRESULT(0)
         }
-        _ => DefWindowProcW(hwnd, msg, wparam, lparam),
+        _ => unsafe { DefWindowProcW(hwnd, msg, wparam, lparam) },
     }
 }

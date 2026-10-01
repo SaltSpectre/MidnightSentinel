@@ -4,9 +4,9 @@
 //! own mutex name, so the two processes enforce single-instance independently
 //! of one another.
 
-use windows::core::PCWSTR;
-use windows::Win32::Foundation::{CloseHandle, GetLastError, ERROR_ALREADY_EXISTS, HANDLE};
+use windows::Win32::Foundation::{CloseHandle, ERROR_ALREADY_EXISTS, GetLastError, HANDLE};
 use windows::Win32::System::Threading::{CreateMutexW, ReleaseMutex};
+use windows::core::PCWSTR;
 
 /// Holds the OS mutex handle that marks this process as "the" running
 /// instance for a given name. Dropping it releases and closes the handle.
