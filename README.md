@@ -110,7 +110,7 @@ I am always open to feedback and ideas. Feel free to create an issue, or, if you
 Dialogs in `midsent.exe` (About, warning) are built with [Slint](https://slint.dev/), used under its [Royalty-free license](https://github.com/slint-ui/slint/blob/master/LICENSES/LicenseRef-Slint-Royalty-free-2.0.md).
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/slint-ui/slint/master/logo/MadeWithSlint-logo-whitebg.png" alt="Made with Slint" width="200">
+  <img src="https://raw.githubusercontent.com/slint-ui/slint/master/logo/slint-logo-simple-light.svg" alt="Made with Slint" width="200">
 </div>
 
 ## License
